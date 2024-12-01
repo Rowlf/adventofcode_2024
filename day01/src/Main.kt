@@ -17,9 +17,10 @@ fun main() {
 3   3
 """
     val inputData = linesOf(data = example1)
-    //val inputData = linesOf(day = day)
+    // val inputData = linesOf(day = day)
 
     inputData.print(indent = 2, description = "input lines:", take = 6)
+    println()
 
     val lineRegex = """(\d+)\s+(\d+)""".toRegex()
     // keep both lists at one place, no need for an extra class
@@ -45,28 +46,32 @@ fun main() {
 
     // part 1: solutions: 11 / 2057374
 
-    val totalDistance = sortedData.run {
-        first.zip(second).sumOf { (n1, n2) -> abs(n1 - n2) }
+    val duration1 = measureTime {
+        val totalDistance = sortedData.run {
+            first.zip(second).sumOf { (n1, n2) -> abs(n1 - n2) }
+        }
+        println("part 1: total distance: $totalDistance")
     }
-    println("part 1: total distance: $totalDistance")
+    println("        duration: $duration1\n")
 
     // part 2: solutions: 31 / 23177084
 
-    val duration = measureTime {
+    val duration2 = measureTime {
         val similarityScore = sortedData.run {
             first.sumOf { n1 -> n1 * second.count { n2 -> n1 == n2 } }
         }
         println("part 2: similarity score: $similarityScore")
     }
-    println("part 2: duration: $duration")
+    println("        duration: $duration2\n")
 
-    val durationV2 = measureTime {
+    // exploit the sorted structure
+    val duration2a = measureTime {
         val similarityScore = sortedData.run {
             first.sumOf { n1 -> second.run { binarySearch(n1).let { index ->
-                if (index < 0) 0 else n1 * (1 + countWhile(index - 1, -1, n1) + countWhile(index + 1, 1, n1))
+                if (index >= 0) n1 * (1 + countWhile(index - 1, -1, n1) + countWhile(index + 1, 1, n1)) else 0
             } } }
         }
-        println("part 2: similarity score, version 2: $similarityScore")
+        println("part 2: alternative similarity score: $similarityScore")
     }
-    println("part 2: duration version 2: $durationV2")
+    println("        duration: $duration2a (${"%.2f".format(duration2 / duration2a)}x faster)")
 }

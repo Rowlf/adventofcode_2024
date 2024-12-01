@@ -12,10 +12,8 @@ a
 bb
 ccc
 """
-    val example1Lines = linesOf(data = example1)
-    val inputLines = linesOf(day = day)
+    val inputData = linesOf(data = example1)
+    // val inputData = linesOf(day = day)
 
-    val inputData = example1Lines
-    // val inputData = inputLines
     inputData.print(indent = 2, description = "input lines:", take = 2)
 }
