@@ -67,8 +67,8 @@ fun main() {
     // exploit the sorted structure
     val duration2a = measureTime {
         val similarityScore = sortedData.run {
-            first.sumOf { n1 -> second.run { binarySearch(n1).let { index ->
-                if (index >= 0) n1 * (1 + countWhile(index - 1, -1, n1) + countWhile(index + 1, 1, n1)) else 0
+            first.sumOf { n1 -> n1 * second.run { binarySearch(n1).let { index ->
+                if (index >= 0) 1 + countWhile(index - 1, -1, n1) + countWhile(index + 1, 1, n1) else 0
             } } }
         }
         println("part 2: alternative similarity score: $similarityScore")
