@@ -17,7 +17,7 @@ fun main() {
 3   3
 """
     val inputData = linesOf(data = example1)
-    // val inputData = linesOf(day = day)
+    //val inputData = linesOf(day = day)
 
     inputData.print(indent = 2, description = "input lines:", take = 6)
     println()
@@ -36,13 +36,15 @@ fun main() {
     }
 
     // Both parts are straightforward, so this is my shortest and most Kotlin-idiomatic solution with reasonable effort.
-    // Two comments: a collection modelling a sorted list may be tempting, but it does not make sense (imho),
+    // Three comments: a collection modelling a sorted list may be tempting, but it does not make sense (imho),
     // as all adds=inserts have to look for the right place to insert, but this is far more overhead than sorting the list
     // at the end once (in this situation here).
     // Second, technically the second part does not need to work on the sorted lists, but if you really want to,
     // you could simplify the counting by a) doing a binary search to find the first occurrence of a value
     // in the second list, and then b) simply counting down and up as long as the elements are equal
     // -> see example version 2.
+    // Third, another idea utilizing maps with grouping and counting before. This is also a very fast solution
+    // for large data sets.
 
     // part 1: solutions: 11 / 2057374
 
@@ -64,7 +66,7 @@ fun main() {
     }
     println("        duration: $duration2\n")
 
-    // exploit the sorted structure
+    // exploit the sorted structure...
     val duration2a = measureTime {
         val similarityScore = sortedData.run {
             first.sumOf { n1 -> n1 * second.run { binarySearch(n1).let { index ->
@@ -73,5 +75,15 @@ fun main() {
         }
         println("part 2: alternative similarity score: $similarityScore")
     }
-    println("        duration: $duration2a (${"%.2f".format(duration2 / duration2a)}x faster)")
+    println("        duration: $duration2a (${"%.2f".format(duration2 / duration2a)}x faster)\n")
+
+    // count before...
+    val duration2b = measureTime {
+        val similarityScore = sortedData.run {
+            val countMap = second.groupingBy { it }.eachCount()
+            first.sumOf { n1 -> n1 * (countMap[n1] ?: 0) }
+        }
+        println("part 2: alternative similarity score: $similarityScore")
+    }
+    println("        duration: $duration2b (${"%.2f".format(duration2 / duration2b)}x faster)")
 }
