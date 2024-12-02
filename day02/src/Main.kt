@@ -24,11 +24,9 @@ fun main() {
     }
 
     inputData.print(indent = 2, description = "input lines:", take = 6)
-    println()
 
     val reports = inputData.map { line -> line.split(' ').map(String::toInt) }
-    reports.print(indent = 2, description = "input lines:", take = 6)
-    println()
+    reports.print(indent = 2, description = "reports:", take = 6)
 
     /**
      * Checks if a list of integers is either strictly increasing or strictly decreasing
@@ -65,5 +63,5 @@ fun main() {
         val safeReports = reports.count { line -> checkTolerantReport(line) }
         println("part 2: tolerant safe reports: $safeReports")
     }
-    println("        duration: $duration2\n")
+    println("        duration: $duration2")
 }

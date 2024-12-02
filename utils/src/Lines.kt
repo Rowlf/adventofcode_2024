@@ -38,12 +38,13 @@ fun linesOf(day: Int = -1, data: String? = null): Lines {
  * @param description A description to print before the list elements. Default is an empty string.
  * @param take The number of elements from the list to print. Default is the size of the list.
  */
-fun <T> List<T>.print(indent: Int = 0, description: String = "", take: Int = this.size) {
+fun <T> List<T>.print(indent: Int = 0, description: String = "", take: Int = this.size, skipEndl: Boolean = false) {
     if (description.isNotBlank()) { println(description) }
     val prefix = " ".repeat(indent)
     this.take(take).forEach { row ->
         println("$prefix$row")
     }
+    if (!skipEndl) println()
 }
 
 /**

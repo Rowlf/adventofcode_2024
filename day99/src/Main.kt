@@ -12,8 +12,13 @@ a
 bb
 ccc
 """
-    val inputData = linesOf(data = example1)
-    // val inputData = linesOf(day = day)
+
+    val example = 0
+    val inputData = when (example) {
+        0 -> linesOf(day = day)
+        1 -> linesOf(data = example1)
+        else -> throw RuntimeException("no data")
+    }
 
     inputData.print(indent = 2, description = "input lines:", take = 2)
 }

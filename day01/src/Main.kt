@@ -20,7 +20,6 @@ fun main() {
     //val inputData = linesOf(day = day)
 
     inputData.print(indent = 2, description = "input lines:", take = 6)
-    println()
 
     val lineRegex = """(\d+)\s+(\d+)""".toRegex()
     // keep both lists at one place, no need for an extra class
