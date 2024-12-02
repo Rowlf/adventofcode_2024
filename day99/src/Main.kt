@@ -13,7 +13,7 @@ bb
 ccc
 """
 
-    val example = 0
+    val example = 1
     val inputData = when (example) {
         0 -> linesOf(day = day)
         1 -> linesOf(data = example1)

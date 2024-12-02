@@ -34,9 +34,9 @@ fun main() {
      * consecutive elements does not exceed a threshold (here 3 is fixes).
      */
     fun checkReportOneDirection(line: List<Int>, incOrDec: Boolean)
-    = line.zipWithNext().all { (prev, current) -> abs(current - prev).let { dist ->
-        (incOrDec && prev < current || !incOrDec && prev > current) && dist <= 3
-    } }
+    = line.zipWithNext().all { (prev, current) ->
+        (incOrDec && prev < current || !incOrDec && prev > current) && abs(current - prev) <= 3
+    }
 
     /** checks in both directions */
     fun checkReport(line: List<Int>)
