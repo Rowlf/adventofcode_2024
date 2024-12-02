@@ -16,7 +16,7 @@ fun main() {
 8 6 4 4 1
 1 3 6 7 9
 """
-    val example = 0
+    val example = 1
     val inputData = when (example) {
         0 -> linesOf(day = day)
         1 -> linesOf(data = example1)
@@ -25,7 +25,7 @@ fun main() {
 
     inputData.print(indent = 2, description = "input lines:", take = 6)
 
-    val reports = inputData.map { line -> line.split(' ').map(String::toInt) }
+    val reports = inputData.map { line -> extractIntegers(line) }
     reports.print(indent = 2, description = "reports:", take = 6)
 
     /**
