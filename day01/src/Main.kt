@@ -50,18 +50,18 @@ fun main() {
 
     // part 1: solutions: 11 / 2057374
 
-    timeResult {
+    timeResult { // [M3 523us]
         sortedData.run { first.zip(second).sumOf { (n1, n2) -> abs(n1 - n2) } }
     }.let { (dt,result) -> println("[part 1] result: $result, dt: $dt (total distance)") }
 
     // part 2: solutions: 31 / 23177084
 
-    timeResult {
+    timeResult { // [M3 6.750792ms]
         sortedData.run { first.sumOf { n1 -> n1 * second.count { n2 -> n1 == n2 } } }
     }.let { (dt,result) -> println("[part 2] result: $result, dt: $dt (similarity score)") }
 
     // exploit the sorted structure...
-    timeResult {
+    timeResult { // [M3 810.125us]
         sortedData.run { first.sumOf { n1 -> n1 * second.run {
             binarySearch(n1).let { index ->
                 if (index >= 0) 1 + countWhile(index - 1, -1, n1) + countWhile(index + 1, 1, n1) else 0
@@ -70,7 +70,7 @@ fun main() {
     }.let { (dt,result) -> println("[part 2] result: $result, dt: $dt (alternative similarity score)") }
 
     // count before...
-    timeResult {
+    timeResult { // [M3 1.769416ms]
         sortedData.run {
             val countMap = second.groupingBy { it }.eachCount()
             first.sumOf { n1 -> n1 * (countMap[n1] ?: 0) }

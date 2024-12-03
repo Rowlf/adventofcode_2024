@@ -25,7 +25,7 @@ xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))
 
     // part 1: solutions: 161 / 166630675
 
-    timeResult {
+    timeResult { // [M3 7.466041ms]
         val regex = Regex("mul\\((\\d+,\\d+)\\)")
         inputData.sumOf { line ->
             regex.findAll(line).sumOf { it.groupValues[1].extractProduct() }
@@ -34,7 +34,7 @@ xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))
 
     // part 2: solutions: 48 / 93465710
 
-    timeResult {
+    timeResult { // [M3 1.264500ms]
         var switch = true
         val regex = Regex("mul\\((\\d+,\\d+)\\)|do\\(\\)|don't\\(\\)")
         inputData.sumOf { line ->

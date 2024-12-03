@@ -15,7 +15,7 @@ fun main() {
 8 6 4 4 1
 1 3 6 7 9
 """
-    val example = 1
+    val example = 0
     val inputData = when (example) {
         0 -> linesOf(day = day)
         1 -> linesOf(data = example1)
@@ -50,13 +50,13 @@ fun main() {
 
     // part 1: solutions: 2 / 299
 
-    timeResult {
+    timeResult { // [M3 1.321416ms]
         reports.count { line -> checkReport(line) }
     }.let { (dt,result) -> println("[part 1] result: $result, dt: $dt (safe reports)") }
 
     // part 2: solutions: 4 / 364
 
-    timeResult {
+    timeResult { // [M3 4.178792ms]
         reports.count { line -> checkTolerantReport(line) }
     }.let { (dt,result) -> println("[part 2] result: $result, dt: $dt (tolerant safe reports)") }
 }
