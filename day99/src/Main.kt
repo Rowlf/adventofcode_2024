@@ -1,7 +1,5 @@
 // (C) 2024 A.Voß, a.voss@fh-aachen.de, kotlin@codebasedlearning.dev
 
-// template
-
 const val day = 99
 
 fun main() {
@@ -21,4 +19,8 @@ ccc
     }
 
     inputData.print(indent = 2, description = "input lines:", take = 2)
+
+    timeResult {
+        23
+    }.let { (dt,result) -> println("[part 1] result: $result, dt: $dt (...)") }
 }

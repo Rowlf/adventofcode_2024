@@ -1,7 +1,6 @@
 // (C) 2024 A.Voß, a.voss@fh-aachen.de, kotlin@codebasedlearning.dev
 
 import kotlin.math.abs
-import kotlin.time.measureTime
 
 const val day = 1
 
@@ -16,8 +15,12 @@ fun main() {
 3   9
 3   3
 """
-    val inputData = linesOf(data = example1)
-    //val inputData = linesOf(day = day)
+    val example = 0
+    val inputData = when (example) {
+        0 -> linesOf(day = day)
+        1 -> linesOf(data = example1)
+        else -> throw RuntimeException("no data")
+    }
 
     inputData.print(indent = 2, description = "input lines:", take = 6)
 
@@ -47,42 +50,30 @@ fun main() {
 
     // part 1: solutions: 11 / 2057374
 
-    val duration1 = measureTime {
-        val totalDistance = sortedData.run {
-            first.zip(second).sumOf { (n1, n2) -> abs(n1 - n2) }
-        }
-        println("part 1: total distance: $totalDistance")
-    }
-    println("        duration: $duration1\n")
+    timeResult {
+        sortedData.run { first.zip(second).sumOf { (n1, n2) -> abs(n1 - n2) } }
+    }.let { (dt,result) -> println("[part 1] result: $result, dt: $dt (total distance)") }
 
     // part 2: solutions: 31 / 23177084
 
-    val duration2 = measureTime {
-        val similarityScore = sortedData.run {
-            first.sumOf { n1 -> n1 * second.count { n2 -> n1 == n2 } }
-        }
-        println("part 2: similarity score: $similarityScore")
-    }
-    println("        duration: $duration2\n")
+    timeResult {
+        sortedData.run { first.sumOf { n1 -> n1 * second.count { n2 -> n1 == n2 } } }
+    }.let { (dt,result) -> println("[part 2] result: $result, dt: $dt (similarity score)") }
 
     // exploit the sorted structure...
-    val duration2a = measureTime {
-        val similarityScore = sortedData.run {
-            first.sumOf { n1 -> n1 * second.run { binarySearch(n1).let { index ->
+    timeResult {
+        sortedData.run { first.sumOf { n1 -> n1 * second.run {
+            binarySearch(n1).let { index ->
                 if (index >= 0) 1 + countWhile(index - 1, -1, n1) + countWhile(index + 1, 1, n1) else 0
-            } } }
-        }
-        println("part 2: alternative similarity score: $similarityScore")
-    }
-    println("        duration: $duration2a (${"%.2f".format(duration2 / duration2a)}x faster)\n")
+            }
+        } } }
+    }.let { (dt,result) -> println("[part 2] result: $result, dt: $dt (alternative similarity score)") }
 
     // count before...
-    val duration2b = measureTime {
-        val similarityScore = sortedData.run {
+    timeResult {
+        sortedData.run {
             val countMap = second.groupingBy { it }.eachCount()
             first.sumOf { n1 -> n1 * (countMap[n1] ?: 0) }
         }
-        println("part 2: alternative similarity score: $similarityScore")
-    }
-    println("        duration: $duration2b (${"%.2f".format(duration2 / duration2b)}x faster)")
+    }.let { (dt,result) -> println("[part 2] result: $result, dt: $dt (alternative similarity score)") }
 }

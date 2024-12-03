@@ -1,7 +1,6 @@
 // (C) 2024 A.Voß, a.voss@fh-aachen.de, kotlin@codebasedlearning.dev
 
 import kotlin.math.abs
-import kotlin.time.measureTime
 
 const val day = 2
 
@@ -25,7 +24,7 @@ fun main() {
 
     inputData.print(indent = 2, description = "input lines:", take = 6)
 
-    val reports = inputData.map { line -> extractIntegers(line) }
+    val reports = inputData.map { line -> line.extractIntegers(' ') }
     reports.print(indent = 2, description = "reports:", take = 6)
 
     /**
@@ -51,17 +50,13 @@ fun main() {
 
     // part 1: solutions: 2 / 299
 
-    val duration1 = measureTime {
-        val safeReports = reports.count { line -> checkReport(line) }
-        println("part 1: safe reports: $safeReports")
-    }
-    println("        duration: $duration1\n")
+    timeResult {
+        reports.count { line -> checkReport(line) }
+    }.let { (dt,result) -> println("[part 1] result: $result, dt: $dt (safe reports)") }
 
     // part 2: solutions: 4 / 364
 
-    val duration2 = measureTime {
-        val safeReports = reports.count { line -> checkTolerantReport(line) }
-        println("part 2: tolerant safe reports: $safeReports")
-    }
-    println("        duration: $duration2")
+    timeResult {
+        reports.count { line -> checkTolerantReport(line) }
+    }.let { (dt,result) -> println("[part 2] result: $result, dt: $dt (tolerant safe reports)") }
 }
