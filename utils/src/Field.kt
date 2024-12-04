@@ -26,6 +26,7 @@ class Field<T> {
 
     operator fun get(row: Int, col: Int): T = _data[row][col]
     operator fun get(pos: Position): T = get(pos.row, pos.col)
+    operator fun get(seq: Sequence<Position>): Sequence<T> = seq.map(this::get)
     operator fun set(row: Int, col: Int, value: T) { _data[row][col] = value }
     operator fun set(pos: Position, value: T) { set(pos.row, pos.col, value) }
 
@@ -37,42 +38,57 @@ class Field<T> {
         }
     }
 
-    enum class Direction { LEFT, RIGHT, UP, DOWN, ROUND }
+    enum class LineDirection(val rowOffset: Int, val colOffset: Int) {
+        UP(-1, 0),
+        DOWN(+1, 0),
+        LEFT(0, -1),
+        RIGHT(0, +1),
+        UPLEFT(-1, -1),
+        DOWNLEFT(+1, -1),
+        UPRIGHT(-1, +1),
+        DOWNRIGHT(+1, +1),
+    }
 
-    fun positions(start: Position, direction: Direction, skipStart: Boolean = false)
-    = positions(start.row, start.col, direction, skipStart)
-
-    fun positions(startRow: Int, startCol: Int, direction: Direction, skipStart: Boolean = false)
-    = sequence {
-        require(startRow in 0 ..< rows && startCol in 0 ..< cols) {
-            "start ($startRow,$startCol) must be within [0..${rows - 1},0..${cols - 1}]"
-        }
-        val offset = if (skipStart) 1 else 0
-        when (direction) {
-            Direction.LEFT -> for (col in startCol-offset downTo 0) yield(Position(startRow, col))
-            Direction.RIGHT -> for (col in startCol+offset until cols) yield(Position(startRow, col))
-            Direction.UP -> for (row in startRow-offset downTo 0) yield(Position(row, startCol))
-            Direction.DOWN -> for (row in startRow+offset until rows) yield(Position(row, startCol))
-            Direction.ROUND -> yieldAll(generateRoundIndices(startRow, startCol, skipStart))
+    fun positions() = sequence {
+        for (row in 0 ..< rows) {
+            for (col in 0 ..< cols) {
+                yield(Position(row, col))
+            }
         }
     }
 
-    private fun generateRoundIndices(startRow: Int, startCol: Int, skipStart: Boolean)
-    = sequence { // or: (-1..1).asSequence().flatMap { row -> (-1..1).asSequence().map { col -> ...
-        (-1..1).forEach { rowOffset ->
-            (-1..1).forEach { colOffset ->
+    fun linePositions(start: Position, direction: LineDirection, skipStart: Boolean = false)
+    = sequence {
+        require(start.row in 0 ..< rows && start.col in 0 ..< cols) {
+            "start ($start) must be within [0..${rows - 1},0..${cols - 1}]"
+        }
+        var row = start.row + if (skipStart) direction.rowOffset else 0
+        var col = start.col + if (skipStart) direction.colOffset else 0
+        var cnt = 0
+        while (row in 0 ..< rows && col in 0 ..< cols) {
+            yield(Position(row, col))
+            row += direction.rowOffset
+            col += direction.colOffset
+            cnt++
+        }
+    }
+
+    fun squarePositions(start: Position, skipStart: Boolean = false, extent: Int = 1)
+    = sequence { // or such as: (-1..1).asSequence().flatMap { row -> (-1..1).asSequence().map { col -> ...
+        (-extent..extent).forEach { rowOffset ->
+            (-extent..extent).forEach { colOffset ->
                 if (!skipStart || rowOffset != 0 || colOffset != 0)
-                    yield(Position(startRow+rowOffset, startCol+colOffset))
+                    yield(Position(start.row+rowOffset, start.col+colOffset))
             }
         }
     }.filter { (row,col) -> (row in 0 ..< rows) && (col in 0 ..< cols) }
 
-    fun elements(start: Position, direction: Direction, skipStart: Boolean = false)
-    = elements(start.row, start.col, direction, skipStart)
-
-    fun elements(startRow: Int, startCol: Int, direction: Direction, skipStart: Boolean = false)
-    = positions(startRow, startCol, direction, skipStart)
-        .map { (row, col) -> _data[row][col] }
+//    fun elements(start: Position, direction: Direction, skipStart: Boolean = false)
+//    = elements(start.row, start.col, direction, skipStart)
+//
+//    fun elements(startRow: Int, startCol: Int, direction: Direction, skipStart: Boolean = false)
+//    = positions(startRow, startCol, direction, skipStart)
+//        .map { (row, col) -> _data[row][col] }
 }
 
 /**
@@ -85,3 +101,20 @@ class Field<T> {
  * @return A Field<Char> object containing the characters from the Lines.
  */
 fun Lines.toField() = Field<Char>().apply { this@toField.forEach { add(it.toList()) } }
+
+/**
+ * Compares the contents of the sequence with another iterable to determine if they are equal.
+ *
+ * @param other The other iterable to compare against.
+ * @return `true` if both the sequence and the iterable contain the same elements in the same order, `false` otherwise.
+ */
+fun <T> Sequence<T>.contentEquals(other: Iterable<T>): Boolean {
+    val lhs = this.iterator()
+    val rhs = other.iterator()
+
+    // or with zip, but we need to check the end, so this is the shortest (imho)
+    while (lhs.hasNext() && rhs.hasNext()) {
+        if (lhs.next() != rhs.next()) return false
+    }
+    return !lhs.hasNext() && !rhs.hasNext()
+}

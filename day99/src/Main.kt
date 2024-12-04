@@ -20,7 +20,7 @@ ccc
 
     inputData.print(indent = 2, description = "input lines:", take = 2)
 
-    timeResult {
+    timeResult { // [M3 ]
         23
     }.let { (dt,result) -> println("[part 1] result: $result, dt: $dt (...)") }
 }

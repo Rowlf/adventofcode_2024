@@ -107,15 +107,18 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
             field.print(indent = 2, description = "field:")
 
             println("elements right, start (2,3), skip=true:")
-            println(field.elements(startRow = 2, startCol = 3, direction = Field.Direction.RIGHT, skipStart = true).joinToString("|", prefix = "  "))
+            println(field[field.linePositions(start = Position(2,3), direction = Field.LineDirection.RIGHT, skipStart = true)].joinToString("|", prefix = "  "))
 
             println("positions left, start (4,3):")
-            println(field.positions(startRow = 4, startCol = 3, direction = Field.Direction.LEFT).joinToString("|", prefix = "  "))
+            println(field[field.linePositions(start = Position(4,3), direction = Field.LineDirection.LEFT)].joinToString("|", prefix = "  "))
+
+            println("positions left, start (4,3), only 3 elements:")
+            println(field[field.linePositions(start = Position(4,3), direction = Field.LineDirection.LEFT).take(3)].joinToString("|", prefix = "  "))
 
             println("elements around start (0,2), skip=true:")
-            println(field.elements(startRow = 0, startCol = 2, direction = Field.Direction.ROUND, skipStart = true).joinToString("|", prefix = "  "))
+            println(field[field.squarePositions(start = Position(0,2), skipStart = true, extent = 1)].joinToString("|", prefix = "  "))
 
-            // use field.elements(...).iterator() if you need hasNext/next:
+            // use field.positions(...).iterator() if you need hasNext/next:
             //      while (iterator.hasNext()) {
             //          ... iterator.next()
         }
