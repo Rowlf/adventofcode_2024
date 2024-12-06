@@ -3,7 +3,15 @@
 /**
  * A simple point class.
  */
-data class Position(val row: Int, val col: Int)
+data class Position(val row: Int, val col: Int) {
+    operator fun times(scale: Int): Position {
+        return Position(row * scale, col * scale)
+    }
+
+    operator fun plus(shift: Position): Position {
+        return Position(row + shift.row, col + shift.col)
+    }
+}
 
 /**
  * Represents a 2D field of elements of type T. It supports basic
@@ -46,7 +54,19 @@ class Field<T> {
         UPLEFT(-1, -1),
         DOWNLEFT(+1, -1),
         UPRIGHT(-1, +1),
-        DOWNRIGHT(+1, +1),
+        DOWNRIGHT(+1, +1);
+
+        fun asPosition() = Position(rowOffset, colOffset)
+        fun clockWise() = when (this) {
+            UP -> RIGHT
+            DOWN -> LEFT
+            LEFT -> UP
+            RIGHT -> DOWN
+            UPLEFT -> UPRIGHT
+            UPRIGHT -> DOWNRIGHT
+            DOWNRIGHT -> DOWNLEFT
+            DOWNLEFT -> UPLEFT
+        }
     }
 
     fun positions() = sequence {
@@ -83,12 +103,15 @@ class Field<T> {
         }
     }.filter { (row,col) -> (row in 0 ..< rows) && (col in 0 ..< cols) }
 
-//    fun elements(start: Position, direction: Direction, skipStart: Boolean = false)
-//    = elements(start.row, start.col, direction, skipStart)
-//
-//    fun elements(startRow: Int, startCol: Int, direction: Direction, skipStart: Boolean = false)
-//    = positions(startRow, startCol, direction, skipStart)
-//        .map { (row, col) -> _data[row][col] }
+    inline fun <R> temporarilyReplace(pos: Position, value: T, block: Field<T>.() -> R): R {
+        val original = this[pos]
+        this[pos] = value
+        return try {
+            block()
+        } finally {
+            this[pos] = original
+        }
+    }
 }
 
 /**
