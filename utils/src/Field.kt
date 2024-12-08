@@ -11,6 +11,10 @@ data class Position(val row: Int, val col: Int) {
     operator fun plus(shift: Position): Position {
         return Position(row + shift.row, col + shift.col)
     }
+
+    operator fun minus(rhs: Position): Position {
+        return Position(row - rhs.row, col - rhs.col)
+    }
 }
 
 /**
@@ -76,6 +80,8 @@ class Field<T> {
             }
         }
     }
+
+    fun isValid(pos: Position) = (pos.row in 0..<rows && pos.col in 0..<cols)
 
     fun linePositions(start: Position, direction: LineDirection, skipStart: Boolean = false)
     = sequence {
