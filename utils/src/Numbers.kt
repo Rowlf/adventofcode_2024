@@ -10,3 +10,5 @@
  * @return A list of integers extracted from the input string.
  */
 fun String.extractIntegers(delimiter: Char) = this.trim().split(delimiter).mapNotNull { it.trim().toIntOrNull() }
+
+fun String.extractLongs(delimiter: Char) = this.trim().split(delimiter).mapNotNull { it.trim().toLongOrNull() }
