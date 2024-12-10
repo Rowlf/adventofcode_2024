@@ -113,6 +113,14 @@ class Field<T> {
         }
     }.filter { (row,col) -> (row in 0 ..< rows) && (col in 0 ..< cols) }
 
+    fun nextCrossWayPositions(start: Position, past: Position? = null)
+    = sequence {
+        yield(start + LineDirection.RIGHT.asPosition())
+        yield(start + LineDirection.DOWN.asPosition())
+        yield(start + LineDirection.LEFT.asPosition())
+        yield(start + LineDirection.UP.asPosition())
+    }.filter { isValid(it) && (past==null || it != past) }
+
     inline fun <R> temporarilyReplace(pos: Position, value: T, block: Field<T>.() -> R): R {
         val original = this[pos]
         this[pos] = value
@@ -134,6 +142,8 @@ class Field<T> {
  * @return A Field<Char> object containing the characters from the Lines.
  */
 fun Lines.toField() = Field<Char>().apply { this@toField.forEach { add(it.toList()) } }
+
+fun <R> Lines.toField(block: (Char) -> R) = Field<R>().apply { this@toField.forEach { add(it.map { c -> block(c) }) } }
 
 /**
  * Compares the contents of the sequence with another iterable to determine if they are equal.

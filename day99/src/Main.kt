@@ -4,19 +4,19 @@ const val day = 99
 
 fun main() {
     println("Day $day\n-----\n")
+    // fetchAoCInputIfNeeded(day)
 
-    val example1 = """
+    val examples = listOf(
+// 1: ..
+"""
 a
 bb
 ccc
-"""
+""",
+)
 
     val example = 1
-    val inputData = when (example) {
-        0 -> linesOf(day = day)
-        1 -> linesOf(data = example1)
-        else -> throw RuntimeException("no data")
-    }
+    val inputData = if (example==0) linesOf(day = day) else linesOf(data = examples[example-1])
 
     inputData.print(indent = 2, description = "input lines:", take = 2)
 

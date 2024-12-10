@@ -32,6 +32,7 @@ fun main() {
 
     fun checksum(blocks: List<DiskBlock>): Long = blocks.fold(0 to 0L) { (pos,sum), block ->
         if (block.isFree) Pair(pos+block.len,sum)
+        // sum: id * pos..<pos+len
         else Pair(pos+block.len,sum + block.id * (block.len * pos + block.len*(block.len-1L)/2L)) // sum 0..n = n*(n+1)/2
     }.second
 

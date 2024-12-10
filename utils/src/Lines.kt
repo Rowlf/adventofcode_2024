@@ -1,17 +1,6 @@
 // (C) 2024 A.Voß, a.voss@fh-aachen.de, kotlin@codebasedlearning.dev
 
-import java.io.File
-
 typealias Lines = List<String>
-
-/**
- * Constructs a File object based on the given day and file name.
- *
- * @param day The day number, which is used to use a subdirectory in the format "dayXX".
- * @param fileName The name of the data file within the subdirectory.
- * @return A File object representing the specified file in the "dayXX/data" directory.
- */
-private fun fileOf(day: Int, fileName: String) = File("./day${String.format("%02d", day)}/data/$fileName")
 
 /**
  * Reads input lines for a given day from a specified data string or from a default input file.
