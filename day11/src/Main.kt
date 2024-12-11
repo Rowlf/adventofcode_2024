@@ -1,3 +1,6 @@
+import kotlin.math.log10
+import kotlin.math.pow
+
 // (C) 2024 A.Voß, a.voss@fh-aachen.de, kotlin@codebasedlearning.dev
 
 const val day = 11
@@ -36,14 +39,23 @@ fun main() {
                 if (id == 0L) {
                     nextStones[1L] += count
                 } else {
-                    val str = id.toString()
+                    // it feels a little bit better... and, id is not 0 here!
+                    val numDigits = log10(id.toDouble()).toInt() + 1
+                    if (numDigits % 2 == 0) {
+                        val divisor = 10.0.pow(numDigits / 2).toLong()
+                        nextStones[id / divisor] += count
+                        nextStones[id % divisor] += count
+                    } else {
+                        nextStones[id * 2024L] += count
+                    }
+                    /* val str = id.toString()
                     val len = str.length
                     if (len % 2 == 0) {
                         nextStones[str.substring(0, len / 2).toLong()] += count  // or take()
                         nextStones[str.substring(len / 2).toLong()] += count     // or drop()
                     } else {
                         nextStones[id * 2024L] += count
-                    }
+                    } */
                 }
             }
             current = 1 - current
@@ -51,13 +63,13 @@ fun main() {
         return stones[current].values.sum()
     }
 
-    // part 1: solutions: 193607
+    // part 1: solution: 193607
 
-    timeResult { // [M3 3.69ms]
+    timeResult { // [M3 2.876ms]
         countStones(25)
     }.let { (dt, result) -> println("[part 1] result: $result, dt: $dt (stones 25)") }
 
-    // part 2: solutions: 229557103025807
+    // part 2: solution: 229557103025807
 
     timeResult { // [M3 29.627292ms]
         countStones(75)
