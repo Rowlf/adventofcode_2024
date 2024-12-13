@@ -74,5 +74,5 @@ Prize: X=18641, Y=10279
         blocks.sumOf { block ->
             ClawMachine(block, offset = 10000000000000L).solve().let { (solvable, A, B) -> if (solvable) A*3+B*1 else 0L }
         }
-    }.let { (dt,result) -> println("[part 1] result: $result, dt: $dt (with conversion error)") }
+    }.let { (dt,result) -> println("[part 2] result: $result, dt: $dt (with conversion error)") }
 }
