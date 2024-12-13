@@ -19,6 +19,8 @@ data class Position(val row: Int, val col: Int) {
     operator fun unaryMinus() = Position(-row, -col)
 }
 
+operator fun Position.plus(other: Field.LineDirection) = this + other.asPosition()
+
 /**
  * Represents a 2D field of elements of type T. It supports basic
  * operations such as adding rows, accessing and modifying elements,
@@ -72,6 +74,11 @@ class Field<T> {
             UPRIGHT -> DOWNRIGHT
             DOWNRIGHT -> DOWNLEFT
             DOWNLEFT -> UPLEFT
+        }
+
+        companion object {
+            val Cross: List<LineDirection>
+                get() = listOf(RIGHT, DOWN, LEFT, UP)
         }
     }
 
@@ -130,6 +137,19 @@ class Field<T> {
             this[pos] = original
         }
     }
+
+    //override fun iterator(): Iterator<Pair<Position,T>> {
+    //    return positions().map {pos-> pos to get(pos)}.iterator()
+    //}
+}
+
+fun <T> Field<T>.forEachWithPosition(block: (Position,T) -> Unit) {
+    positions().forEach { pos -> block(pos, this[pos]) }
+//    for (row in 0 ..< rows) {
+//        for (col in 0 ..< cols) {
+//            block(Position(row, col), this[row, col])
+//        }
+//    }
 }
 
 /**
@@ -142,8 +162,14 @@ class Field<T> {
  * @return A Field<Char> object containing the characters from the Lines.
  */
 fun Lines.toField() = Field<Char>().apply { this@toField.forEach { add(it.toList()) } }
+//fun Lines.toFieldIndexed() = Field<Char>().apply { this@toField.forEach { add(it.toList()) } }
 
 fun <R> Lines.toField(block: (Char) -> R) = Field<R>().apply { this@toField.forEach { add(it.map { c -> block(c) }) } }
+fun <R> Lines.toFieldWithPosition(block: (Position,Char) -> R) = Field<R>().apply {
+    this@toFieldWithPosition.forEachIndexed { row, line ->
+        add(line.mapIndexed { col, c -> block(Position(row,col),c) })
+    }
+}
 
 /**
  * Compares the contents of the sequence with another iterable to determine if they are equal.
