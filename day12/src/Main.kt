@@ -71,6 +71,8 @@ AAAAAA
     data class Square(val pos: Position, val c: Char,
                       val sides: Map<LineDirection, Side>
                       = LineDirection.Cross.associateWith { dir -> Side(FieldStatus.Out) },
+                      val corners: MutableMap<LineDirection, Boolean>
+                      = LineDirection.X.associateWith { dir -> false }.toMutableMap(),
     )
     data class Region(var sides: Int = 0, val squares: MutableSet<Square> = mutableSetOf()) {}
 
@@ -89,6 +91,15 @@ AAAAAA
             square.sides.forEach { (dir, side) ->
                 if (this.isValid(pos+dir))
                     side.status = if (square.c == this[pos+dir].c) FieldStatus.Same else FieldStatus.Other
+            }
+        }
+        forEachWithPosition { pos, square ->
+            square.corners.keys.forEach { dir ->
+                square.corners[dir] = dir.split().let { (d1, d2) ->
+                    (square.sides.isNotSame(d1) && square.sides.isNotSame(d2))
+                            || (square.sides.isSame(d1) && square.sides.isSame(d2)
+                            && this.isValid(pos + dir) && this[pos + dir].c != square.c)
+                }
             }
         }
     }
@@ -126,12 +137,18 @@ AAAAAA
     In this case you just have to keep track of when a new page starts and assign it to the correct region.
 
     Another observation can also be used: the number of sides is equal to the number of corners.
-    Many people on Reddit have mentioned this approach. Here the tricky part is to count the correct corners.
+    Many people on Reddit have mentioned this approach. Here the tricky part is to count inner and outer corners.
+
+    Update:
+        With the right garden-preparation this corner approach is ridicules short. Just check for every square
+        if it is an inner or outer corner. Then, finally, count them in your region - done :-)
 
     What we all have in common is that the code of part 2 is mostly ugly - so I am in good company :-)
     */
 
     // part 2: solution: - / 885394
+
+    // see also V2 afterward
 
     timeResult { // [M3 9.355584ms]
         regions.sumOf { region ->
@@ -171,8 +188,15 @@ AAAAAA
                     }
                 }
             }
-            region.sides = nextSideId
-            region.squares.size * (region.sides - sameSides.size)
+            region.sides = nextSideId - sameSides.size
+            region.squares.size * (region.sides )
         }
-    }.let { (dt,result) -> println("[part 2] result: $result, dt: $dt (garden sides)") }
+    }.let { (dt,result) -> println("[part 2-V1] result: $result, dt: $dt (garden sides)") }
+
+    timeResult { // [M3 9.355584ms]
+        regions.sumOf { region ->
+            val sides = region.squares.sumOf { sq -> sq.corners.count { it.value } }
+            region.squares.size * ( sides ) // region.sides
+        }
+    }.let { (dt,result) -> println("[part 2-V2] result: $result, dt: $dt (garden sides)") }
 }

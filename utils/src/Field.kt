@@ -75,10 +75,19 @@ class Field<T> {
             DOWNRIGHT -> DOWNLEFT
             DOWNLEFT -> UPLEFT
         }
+        fun split() = when (this) {
+            UPLEFT -> listOf(UP, LEFT)
+            UPRIGHT -> listOf(UP, RIGHT)
+            DOWNRIGHT -> listOf(DOWN, RIGHT)
+            DOWNLEFT -> listOf(DOWN, LEFT)
+            else -> listOf()
+        }
 
         companion object {
             val Cross: List<LineDirection>
                 get() = listOf(RIGHT, DOWN, LEFT, UP)
+            val X: List<LineDirection>
+                get() = listOf(DOWNRIGHT, DOWNLEFT, UPLEFT, UPRIGHT)
         }
     }
 
