@@ -30,13 +30,29 @@ operator fun Position.plus(other: Field.LineDirection) = this + other.asPosition
  *
  * @param T The type of elements stored in the field.
  */
-class Field<T> {
+class Field<T>() {
     private val _data: MutableList<MutableList<T>> = mutableListOf()
 
     val rows: Int
         get() = _data.size
     val cols: Int
         get() = _data[0].size
+
+    constructor(rows: Int, cols: Int, block: (pos:Position) -> T) : this() {
+        reset(rows, cols, block)
+//        for (row in 0 until rows) {
+//            val rowData = MutableList(cols) { block(Position(row,it)) }
+//            _data.add(rowData)
+//        }
+    }
+
+    fun reset(rows: Int, cols: Int, block: (pos:Position) -> T) {
+        _data.clear()
+        for (row in 0 until rows) {
+            val rowData = MutableList(cols) { block(Position(row,it)) }
+            _data.add(rowData)
+        }
+    }
 
     fun add(row: List<T>) { _data.add(row.toMutableList()) }
 
@@ -46,11 +62,11 @@ class Field<T> {
     operator fun set(row: Int, col: Int, value: T) { _data[row][col] = value }
     operator fun set(pos: Position, value: T) { set(pos.row, pos.col, value) }
 
-    fun print(indent: Int = 0, description: String = "") {
+    fun print(indent: Int = 0, description: String = "", separator: String =" ") {
         if (description.isNotBlank()) { println(description) }
         val prefix = " ".repeat(indent)
         _data.forEach { row ->
-            println(row.joinToString(" ", prefix = prefix))
+            println(row.joinToString(separator, prefix = prefix))
         }
     }
 
@@ -102,6 +118,17 @@ class Field<T> {
     fun isValid(pos: Position) = (pos.row in 0..<rows && pos.col in 0..<cols)
     fun isValidRow(row: Int) = (row in 0..<rows)
     fun isValidCol(col: Int) = (col in 0..<cols)
+
+    fun makeValidWithTurnAround(pos: Position) = if (isValid(pos)) pos
+    else { // assume only once...
+        var (row,col) = pos
+        if (row < 0) { row += rows }
+        if (row >= rows) { row -= rows }
+        if (col < 0) { col += cols }
+        if (col >= cols) { col -= cols }
+        Position(row,col)
+    }
+
 
     fun linePositions(start: Position, direction: LineDirection, skipStart: Boolean = false)
     = sequence {
