@@ -97,6 +97,8 @@ p=9,5 v=-3,-3
                 room[rob.pos] = pattern
             }
             if ((0..<room.rows).any { row -> longestPeriod(row) > maxPattern }) {
+                // show me the tree :-)
+                // room.print(indent = 2, description = "loop $loop:", separator = "")
                 return@timeResult loop
             }
         }
