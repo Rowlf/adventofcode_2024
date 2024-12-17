@@ -1,3 +1,5 @@
+import Field.LineDirection
+
 // (C) 2024 A.Voß, a.voss@fh-aachen.de, kotlin@codebasedlearning.dev
 
 /**
@@ -20,6 +22,9 @@ data class Position(val row: Int, val col: Int) {
 }
 
 operator fun Position.plus(other: Field.LineDirection) = this + other.asPosition()
+operator fun Field.LineDirection.times(scale: Int) = Position(scale*this.rowOffset, scale*this.colOffset)
+operator fun Int.times(other: Field.LineDirection) = other * this
+
 
 /**
  * Represents a 2D field of elements of type T. It supports basic
@@ -45,6 +50,13 @@ class Field<T>() {
 //            _data.add(rowData)
 //        }
     }
+    fun copy():Field<T> {
+        val f = Field<T>()
+        for (l in _data) {
+            f._data.add(l.toMutableList())
+        }
+        return f
+    }
 
     fun reset(rows: Int, cols: Int, block: (pos:Position) -> T) {
         _data.clear()
@@ -55,6 +67,7 @@ class Field<T>() {
     }
 
     fun add(row: List<T>) { _data.add(row.toMutableList()) }
+    fun addAll(rows: Iterable<List<T>>) { for (row in rows) _data.add(row.toMutableList()) }
 
     operator fun get(row: Int, col: Int): T = _data[row][col]
     operator fun get(pos: Position): T = get(pos.row, pos.col)
@@ -97,6 +110,17 @@ class Field<T>() {
             DOWNRIGHT -> listOf(DOWN, RIGHT)
             DOWNLEFT -> listOf(DOWN, LEFT)
             else -> listOf()
+        }
+        val isHorizontal: Boolean
+            get() = (this == LEFT) || (this == RIGHT)
+        val isVertical: Boolean
+            get() = (this == UP) || (this == DOWN)
+        fun isOpposite(dir: LineDirection) = when (this) {
+            UP -> dir == DOWN
+            DOWN -> dir == UP
+            LEFT -> dir == RIGHT
+            RIGHT -> dir == LEFT
+            else -> false
         }
 
         companion object {
@@ -205,6 +229,14 @@ fun <R> Lines.toFieldWithPosition(block: (Position,Char) -> R) = Field<R>().appl
     this@toFieldWithPosition.forEachIndexed { row, line ->
         add(line.mapIndexed { col, c -> block(Position(row,col),c) })
     }
+}
+
+fun Char.toCrossDirection() = when (this) {
+    '^' -> LineDirection.UP
+    '>' -> LineDirection.RIGHT
+    'v' -> LineDirection.DOWN
+    '<' -> LineDirection.LEFT
+    else -> throw Exception("unknown chat: $this")
 }
 
 /**
