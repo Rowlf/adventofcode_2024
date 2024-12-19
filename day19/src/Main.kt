@@ -4,7 +4,7 @@ const val day = 19
 
 fun main() {
     println("Day $day\n-----\n")
-    fetchAoCInputIfNeeded(day)
+    // fetchAoCInputIfNeeded(day)
 
     val examples = listOf(
 // 1: ..
@@ -45,7 +45,7 @@ bbrgwb
 
     // part 1: solutions: 6 / 283
 
-    timeResult { // [M3 84.323959ms]
+    timeResult { // [M3 83.581917ms]
         stripes.count { countArrangements(it) > 0 }
     }.let { (dt,result) -> println("[part 1] result: $result, dt: $dt (designs)") }
 
