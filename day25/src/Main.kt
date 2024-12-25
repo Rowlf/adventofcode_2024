@@ -60,10 +60,10 @@ fun main() {
 
     val lockIndicator = blocks[0][0]
     val pins = lockIndicator.length
-    val spaces = blocks[0].size
+    val spaces = blocks[0].size - 1
 
     val (locks,keys) = blocks.map { it.toField() }.mapIndexed { i, f ->
-        val occupied = (0..<pins).map { pin -> (0..<spaces).count { f[it,pin] == '#' } - 1 }
+        val occupied = (0..<pins).map { pin -> (0..spaces).count { f[it,pin] == '#' } - 1 }
         if (blocks[i][0]==lockIndicator) occupied to null else null to occupied
     }.unzip().let { (x,y) -> x.filterNotNull() to y.filterNotNull() } // instead if lock.add / keys.add... better?
 
@@ -72,7 +72,7 @@ fun main() {
     timeResult { // [M3 14.417125ms]
         locks.sumOf { lock ->
             keys.count { key ->
-                lock.zip(key).all { (l, k) -> l + k < spaces - 1 }
+                lock.zip(key).all { (l, k) -> l + k < spaces }
             }
         }
     }.let { (dt,result) -> println("[part 1] result: $result, dt: $dt (locks and keys)") }
