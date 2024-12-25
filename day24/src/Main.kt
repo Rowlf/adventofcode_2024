@@ -131,7 +131,7 @@ tnw OR pbm -> gnj
     }.let { (dt,result) -> println("[part 1] result: $result, dt: $dt (collect bits)") }
 
     /*
-        Now it gets interesting. A few people solved it by hand, more or less, so did I.
+        Now it gets interesting. A few people solved it, more or less, by hand - so did I.
         First, check the add operation itself:
 
         x: 0 1 0 1 1 0 0 0 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 0 1 0 0 0 0 1 1 1 1 1 0 1 1 0 0 1 1 0 1
@@ -140,12 +140,12 @@ tnw OR pbm -> gnj
         z: 1 0 1 0 1 1 0 1 0 1 1 0 1 0 0 0 1 1 0 1 1 0 0 1 0 1 1 0 0 1 0 1 0 0 1 0 1 1 0 0 0 0 0 1 1 0
         suspicious:                33323130                          1615      1110  8 7 6 5
 
-        In the equations one can find the starter:
+        In the equations one can find the starters:
              z5 wrong (sgt OR bhb -> z05)
             z15 wrong (y15 AND x15 -> z15)
             z30 wrong (kgr AND vrg -> z30)
 
-        Second, check your input. The device models a Carry Ripple Adder, so there is a data flow
+        Second, check your input. The device models a Carry Ripple Adder, and there is a data flow
         like this:
 
         i:  carry bit (c_i)     base bit (b_i)     |    or bit (o_i)    |   and bit (a_i)    |  out_i
