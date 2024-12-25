@@ -178,9 +178,10 @@ tnw OR pbm -> gnj
 
         15: y14 AND x14 -> hdb  x15 XOR y15 -> dvj      hdb OR rkf -> vhr   vhr AND dvj -> ckf  y15 AND x15 -> z15      z15 <-> dnt
         16: y15 AND x15 -> z15  x16 XOR y16 -> scq      dnt OR ckf -> jpj   jpj AND scq -> swj  jpj XOR scq -> z16
-                                                                                   a29
-        29: x28 AND y28 -> mtc  y29 XOR x29 -> fkb      dwd OR mtc -> fhn   fhn AND fkb -> nqs  fhn XOR fkb -> z29      z30 <-> gwc
-        30: x29 AND y29 -> cfp  x30 XOR y30 -> vrg      cfp OR nqs -> kgr                       kgr AND vrg -> z30
+                                                                                           a29
+        29: x28 AND y28 -> mtc  y29 XOR x29 -> fkb      dwd OR mtc -> fhn   fhn AND fkb -> nqs  fhn XOR fkb -> z29
+        30: x29 AND y29 -> cfp  x30 XOR y30 -> vrg      cfp OR nqs -> kgr                       kgr AND vrg -> z30      z30 <-> gwc
+                                                                                                kgr XOR vrg -> gwc
 
         and finally...
 
