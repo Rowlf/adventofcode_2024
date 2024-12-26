@@ -1,6 +1,6 @@
-import Field.LineDirection
-
 // (C) 2024 A.Voß, a.voss@fh-aachen.de, kotlin@codebasedlearning.dev
+
+import Field.LineDirection
 
 /**
  * A simple point class.
