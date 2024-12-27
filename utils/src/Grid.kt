@@ -1,5 +1,7 @@
 // (C) 2024 A.Voß, a.voss@fh-aachen.de, kotlin@codebasedlearning.dev
 
+import kotlin.math.abs
+
 data class RCPos(val row: Int, val col: Int) {
     override fun toString() = "($row|$col)"
 }
@@ -8,6 +10,7 @@ data class RCDir(val dRow: Int, val dCol: Int) {
     override fun toString() = "($dRow:$dCol)"
 
     val asPos: RCPos get() = RCPos(dRow, dCol)
+    val norm1: Int get() = abs(dRow) + abs(dCol)
 
     companion object {
         val Origin = RCDir(0, 0)
@@ -24,8 +27,15 @@ data class RCDir(val dRow: Int, val dCol: Int) {
         val Cardinals = sequenceOf(Right, Down, Left, Up)
         val InterCardinals = sequenceOf(DownRight, DownLeft, UpLeft, UpRight)
         val AllCardinals = sequenceOf(Right, DownRight, Down, DownLeft, Left, UpLeft, Up, UpRight)
-    }
 
+        fun Square(extend: Int) = sequence {
+            for (dr in -extend..extend) {
+                for (dc in -extend..extend) {
+                    yield(RCDir(dr, dc))
+                }
+            }
+        }
+    }
 }
 
 data class RCStep(val pos: RCPos, val dir: RCDir) {
@@ -60,7 +70,7 @@ fun RCPos.walk(step: Iterable<RCDir>) = sequence<RCStep> {
     val it = step.iterator()
     while (it.hasNext()) {
         val step = it.next()
-        yield(RCStep(pos=this@walk + step,dir=step))
+        yield(RCStep(pos=this@walk + step, dir=step))
     }
 }
 
