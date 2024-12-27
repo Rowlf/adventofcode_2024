@@ -157,3 +157,33 @@ fun <T> Graph<T>.minimalSteps(start: T, target:T): Int {
     }
     return -1
 }
+
+fun <T> Graph<T>.findAllShortestPaths(start: T, target: T): List<List<T>> {
+    val shortestPaths = mutableListOf<List<T>>()
+    val queue = ArrayDeque<List<T>>()
+    val distances = mutableMapOf<T, Long>()
+
+    queue.add(listOf(start))
+    distances[start] = 0
+
+    while (queue.isNotEmpty()) {
+        val path = queue.removeFirst()
+        val current = path.last()
+
+        if (current == target) {
+            shortestPaths.add(path)
+            continue
+        }
+
+        neighbors(current).forEach { (neighbor, weight) ->
+            val newDistance = distances[current]!! + weight
+
+            if (neighbor !in distances || newDistance == distances[neighbor]) {
+                distances[neighbor] = newDistance
+                queue.add(path + neighbor)
+            }
+        }
+    }
+
+    return shortestPaths
+}

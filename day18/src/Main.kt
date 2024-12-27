@@ -52,9 +52,13 @@ fun main() {
         toGraph().minimalSteps(RCPos(0,0), RCPos(dims.row-1,dims.col-1))
     }
 
+    // part 1: solutions: 22 / 226
+
     timeResult { // [M3 37.279542ms]
         minimalSteps(down)
     }.let { (dt,result) -> println("[part 1] result: $result, dt: $dt (minimum number of steps)") }
+
+    // part 2: solutions: 6,1 / 60,46
 
     timeResult { // [M3 28.305125ms]
         var (left,right) = down+1 to falling.size-1     // bin search

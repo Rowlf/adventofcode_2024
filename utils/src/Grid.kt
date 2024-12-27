@@ -122,14 +122,16 @@ fun Lines.toGrid() = RCGrid<Char>().apply {
     this.addAll(this@toGrid.map { it.toMutableList() })
 }
 
-fun <T> RCGrid<T>.toGraph() = Graph<RCPos>().also { graph ->
+fun <T> RCGrid<T>.toGraph(predicate: (RCPos) -> Boolean) = Graph<RCPos>().also { graph ->
     this.positions.forEach { pos ->
-        if (this[pos] == '.') {
+        if (predicate(pos)) {
             graph.add(pos)
             for (neighbor in pos.walk(RCDir.Cardinals).map { it.pos }.filter { it in this }) {
-                if (this[neighbor] == '.')
+                if (predicate(neighbor))
                     graph.add(pos, neighbor)
             }
         }
     }
 }
+
+fun RCGrid<Char>.toGraph(pattern: String = ".") = this.toGraph { this[it] in pattern }
