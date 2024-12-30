@@ -1,15 +1,25 @@
 // (C) 2024 A.Voß, a.voss@fh-aachen.de, kotlin@codebasedlearning.dev
 
 import kotlin.math.abs
+import kotlin.sequences.map
 
-data class RCPos(val row: Int, val col: Int) {
-    override fun toString() = "($row|$col)"
+interface AStep {
+    val asPos: RCPos
+    val asDir: RCDir
 }
 
-data class RCDir(val dRow: Int, val dCol: Int) {
+data class RCPos(val row: Int, val col: Int): AStep {
+    override fun toString() = "($row|$col)"
+    override val asPos: RCPos get() = this
+    override val asDir: RCDir get() = RCDir(0, 0)
+}
+
+data class RCDir(val dRow: Int, val dCol: Int): AStep {
     override fun toString() = "($dRow:$dCol)"
 
-    val asPos: RCPos get() = RCPos(dRow, dCol)
+    override val asPos: RCPos get() = RCPos(dRow, dCol)
+    override val asDir: RCDir get() = this
+
     val norm1: Int get() = abs(dRow) + abs(dCol)
 
     companion object {
@@ -38,8 +48,10 @@ data class RCDir(val dRow: Int, val dCol: Int) {
     }
 }
 
-data class RCStep(val pos: RCPos, val dir: RCDir) {
+data class RCStep(val pos: RCPos, val dir: RCDir): AStep {
     override fun toString() = "(${pos.row}|${pos.col} ${dir.dRow}:${dir.dCol})"
+    override val asPos: RCPos get() = pos
+    override val asDir: RCDir get() = dir
 }
 
 // ---
@@ -64,41 +76,68 @@ operator fun Long.times(other: RCDir) = other * this
 operator fun RCDir.plus(other: RCDir) = RCPos(dRow+other.dRow, dCol+other.dCol)
 operator fun RCDir.unaryMinus() = -1 * this
 
-fun RCPos.walk(step: Sequence<RCDir>) = walk(step.asIterable())
+fun RCPos.visit(step: RCDir) = sequence {
+    var pos = this@visit
+    while (true) { yield(pos); pos += step }
+}
 
-fun RCPos.walk(step: Iterable<RCDir>) = sequence<RCStep> {
-    val it = step.iterator()
-    while (it.hasNext()) {
-        val step = it.next()
-        yield(RCStep(pos=this@walk + step, dir=step))
-    }
+fun RCPos.visit(seq: Sequence<RCDir>)
+= sequence { yieldAll(seq.map { this@visit + it }) }
+
+fun RCPos.walk(step: RCDir) = sequence {
+    var pos = this@walk
+    while (true) { yield(RCStep(pos=pos, dir=step)); pos += step }
+}
+
+fun RCPos.walk(seq: Sequence<RCDir>)
+= sequence { yieldAll(seq.map { RCStep(pos=this@walk + it, dir=it) }) }
+
+//
+
+data class RCValue<T>(val pos: RCPos, val dir:RCDir, val value: T): AStep {
+    override fun toString() = "(${pos.row}|${pos.col} ${dir.dRow}:${dir.dCol} '$value')"
+    override val asPos: RCPos get() = pos
+    override val asDir: RCDir get() = dir
+}
+
+fun <T,S:AStep> Sequence<S>.takeWhileInGrid(grid: RCGrid<T>) = this.takeWhile { it.asPos in grid }
+
+fun <T,S:AStep> Sequence<S>.withGrid(grid: RCGrid<T>) = this.takeWhile { it.asPos in grid }.map { RCValue(it.asPos, it.asDir, grid[it.asPos]) }
+
+fun <T,S:AStep> Sequence<S>.toGrid(grid: RCGrid<T>) = this.takeWhile { it.asPos in grid }.map { grid[it.asPos] }
+
+fun <T> Sequence<T>.slice(range: IntRange): Sequence<T> {
+    //require(range.first >= 0) { "Range start must be non-negative" }
+    return drop(range.first).take(range.last - range.first + 1)
 }
 
 // ---
 
 class RCGrid<T>() {
-    val cells: MutableList<MutableList<T>> = mutableListOf()
+    val data: MutableList<MutableList<T>> = mutableListOf()
 
-    val rows: Int get() = cells.size
-    val cols: Int get() = cells[0].size
+    val rows: Int get() = data.size
+    val cols: Int get() = data[0].size
 
     constructor(rows: Int, cols: Int, block: (pos: RCPos) -> T) : this() {
         reset(rows, cols, block)
     }
 
     fun reset(rows: Int, cols: Int, block: (pos: RCPos) -> T) {
-        cells.clear()
-        cells.addAll(MutableList(rows) { row -> MutableList(cols) { col -> block(RCPos(row,col)) } })
+        data.clear()
+        data.addAll(MutableList(rows) { row -> MutableList(cols) { col -> block(RCPos(row,col)) } })
     }
 
-    fun add(row: MutableList<T>) { cells.add(row) }
-    fun addAll(rows: Iterable<MutableList<T>>) { cells.addAll(rows) }
+    fun add(row: MutableList<T>) { data.add(row) }
+    fun addAll(rows: Iterable<MutableList<T>>) { data.addAll(rows) }
 
-    operator fun get(row: Int, col: Int): T = cells[row][col]
+    operator fun get(row: Int, col: Int): T = data[row][col]
     operator fun get(pos: RCPos): T = get(pos.row, pos.col)
-    operator fun get(seq: Sequence<RCPos>): Sequence<T> = seq.map(this::get)
-    operator fun set(row: Int, col: Int, value: T) { cells[row][col] = value }
+    //operator fun get(seq: Sequence<RCPos>): Sequence<T> = seq.map(this::get)
+    operator fun set(row: Int, col: Int, value: T) { data[row][col] = value }
     operator fun set(pos: RCPos, value: T) { set(pos.row, pos.col, value) }
+
+    //operator fun get(step: RCStep): T = get(step.pos.row, step.pos.col)
 
     fun isValid(row: Int, col: Int) = (row in 0..<rows && col in 0..<cols)
     fun isValid(pos: RCPos) = isValid(pos.row, pos.col)
@@ -114,7 +153,7 @@ class RCGrid<T>() {
     fun print(indent: Int = 0, description: String = "", separator: String =" ") {
         if (description.isNotBlank()) { println(description) }
         val prefix = " ".repeat(indent)
-        cells.forEach { row -> println(row.joinToString(separator, prefix = prefix)) }
+        data.forEach { row -> println(row.joinToString(separator, prefix = prefix)) }
     }
 }
 
